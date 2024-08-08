@@ -34,13 +34,29 @@ function drop(e) {
     e.preventDefault();
     const id = e.dataTransfer.getData('text/plain');
     const draggable = document.getElementById(id);
-    if (e.target.classList.contains('square') && e.target.childNodes.length === 0) {
-        if (isValidMove(draggable, e.target)) {
-            e.target.appendChild(draggable);
-            draggable.classList.remove('dragging');
-            e.target.classList.add('highlight');
-            switchTurn();
+    const targetSquare = e.target.classList.contains('square') ? e.target : e.target.parentElement;
+
+    if (isValidMove(draggable, targetSquare)) {
+        const capturedPiece = targetSquare.querySelector('.piece');
+        if (capturedPiece) {
+            targetSquare.removeChild(capturedPiece);
+            targetSquare.classList.add('capture');
+            setTimeout(() => {
+                targetSquare.classList.remove('capture');
+            }, 1000);
         }
+        targetSquare.appendChild(draggable);
+        draggable.classList.remove('dragging');
+        targetSquare.classList.add('highlight');
+        setTimeout(() => {
+            targetSquare.classList.remove('highlight');
+        }, 1000);
+        switchTurn();
+    } else {
+        targetSquare.classList.add('invalid-move');
+        setTimeout(() => {
+            targetSquare.classList.remove('invalid-move');
+        }, 500);
     }
 }
 
@@ -59,6 +75,13 @@ function isValidMove(piece, targetSquare) {
         case '♙': // White Pawn
         case '♟': // Black Pawn
             return isValidPawnMove(pieceColor, startSquare, endSquare);
+        case '♖': // Rook
+            return isValidRookMove(pieceColor, startSquare, endSquare);
+        case '♘': // Knight
+            return isValidKnightMove(pieceColor, startSquare, endSquare);
+        case '♗': // Bishop
+            return isValidBishopMove(pieceColor, startSquare, endSquare);
+        // Add cases for other pieces
         default:
             return true;
     }
@@ -69,12 +92,35 @@ function isValidPawnMove(color, start, end) {
     const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
     if (color === 'white') {
-        return endFile === startFile && endRank === startRank + 1;
+        return (endFile === startFile && endRank === startRank + 1) || (startRank === 2 && endFile === startFile && endRank === startRank + 2);
     } else {
-        return endFile === startFile && endRank === startRank - 1;
+        return (endFile === startFile && endRank === startRank - 1) || (startRank === 7 && endFile === startFile && endRank === startRank - 2);
     }
 }
 
+function isValidRookMove(color, start, end) {
+    const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
+    const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
+
+    return (startFile === endFile && startRank !== endRank) || (startFile !== endFile && startRank === endRank);
+}
+
+function isValidKnightMove(color, start, end) {
+    const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
+    const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
+
+    const dx = Math.abs(endFile - startFile);
+    const dy = Math.abs(endRank - startRank);
+
+    return (dx === 2 && dy === 1) || (dx === 1 && dy === 2);
+}
+
+function isValidBishopMove(color, start, end) {
+    const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
+    const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
+
+    return Math.abs(endFile - startFile) === Math.abs(endRank - startRank);
+}
 
 const turnIndicator = document.createElement('div');
 turnIndicator.id = 'turn-indicator';

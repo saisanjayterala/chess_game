@@ -87,3 +87,28 @@ body {
 .highlight {
     animation: highlightMove 1s ease;
 }
+/* Add styles for capture highlights and invalid move feedback */
+.capture {
+    background-color: #ff9999;
+}
+.invalid-move {
+    animation: invalid-move 0.5s ease;
+}
+
+@keyframes invalid-move {
+    0% {
+        transform: translateX(-10px);
+    }
+    25% {
+        transform: translateX(10px);
+    }
+    50% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
