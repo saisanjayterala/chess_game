@@ -1,7 +1,11 @@
 const pieces = document.querySelectorAll('.piece');
 const squares = document.querySelectorAll('.square');
-let turn = 'white'; // Track the current player's turn
-let gameState = 'in_progress'; // Track the game state (in_progress, checkmate, stalemate)
+let turn = 'white'; // to Track the current player's turn
+let gameState = 'in_progress'; //to  Track the game state (in_progress, checkmate, stalemate, draw)
+let enPassantTarget = null; // to  Track the en-passant target square
+let fiftyMoveRule = 0; // to Track the number of moves without a pawn move or capture
+let promotionQueue = []; // to Track pieces to be promoted
+let boardHistory = []; // to Track the board state history
 
 pieces.forEach(piece => {
     piece.addEventListener('dragstart', dragStart);
@@ -52,8 +56,15 @@ function drop(e) {
         setTimeout(() => {
             targetSquare.classList.remove('highlight');
         }, 1000);
+
+        // Update the game state
+        updateGameState(draggable, targetSquare);
         switchTurn();
-        checkGameState();
+
+        // Handle pawn promotion
+        if (promotionQueue.length > 0) {
+            promotePawns();
+        }
     } else {
         targetSquare.classList.add('invalid-move');
         setTimeout(() => {
@@ -76,7 +87,7 @@ function isValidMove(piece, targetSquare) {
     switch (pieceType) {
         case '♙': // White Pawn
         case '♟': // Black Pawn
-            return isValidPawnMove(pieceColor, startSquare, endSquare);
+            return isValidPawnMove(pieceColor, startSquare, endSquare, targetSquare);
         case '♖': // Rook
             return isValidRookMove(pieceColor, startSquare, endSquare);
         case '♘': // Knight
@@ -92,42 +103,113 @@ function isValidMove(piece, targetSquare) {
     }
 }
 
-function isValidPawnMove(color, start, end) {
+function isValidPawnMove(color, start, end, targetSquare) {
     const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
     const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
     if (color === 'white') {
-        return (endFile === startFile && endRank === startRank + 1) || (startRank === 2 && endFile === startFile && endRank === startRank + 2);
+        if (endFile === startFile && endRank === startRank + 1) {
+            return true;
+        } else if (startRank === 2 && endFile === startFile && endRank === startRank + 2) {
+            enPassantTarget = String.fromCharCode(startFile) + (startRank + 1);
+            return true;
+        } else if (endFile === startFile - 1 && endRank === startRank + 1 && targetSquare.querySelector('.piece')?.id.includes('_b')) {
+            return true;
+        } else if (endFile === startFile + 1 && endRank === startRank + 1 && targetSquare.querySelector('.piece')?.id.includes('_b')) {
+            return true;
+        } else if (enPassantTarget === end && endRank === startRank + 1) {
+            const capturedPawn = document.getElementById(`pawn_b${end.charCodeAt(0) - 'a'.charCodeAt(0) + 1}`);
+            targetSquare.removeChild(capturedPawn);
+            enPassantTarget = null;
+            return true;
+        }
     } else {
-        return (endFile === startFile && endRank === startRank - 1) || (startRank === 7 && endFile === startFile && endRank === startRank - 2);
+        if (endFile === startFile && endRank === startRank - 1) {
+            return true;
+        } else if (startRank === 7 && endFile === startFile && endRank === startRank - 2) {
+            enPassantTarget = String.fromCharCode(startFile) + (startRank - 1);
+            return true;
+        } else if (endFile === startFile - 1 && endRank === startRank - 1 && targetSquare.querySelector('.piece')?.id.includes('_w')) {
+            return true;
+        } else if (endFile === startFile + 1 && endRank === startRank - 1 && targetSquare.querySelector('.piece')?.id.includes('_w')) {
+            return true;
+        } else if (enPassantTarget === end && endRank === startRank - 1) {
+            const capturedPawn = document.getElementById(`pawn_w${end.charCodeAt(0) - 'a'.charCodeAt(0) + 1}`);
+            targetSquare.removeChild(capturedPawn);
+            enPassantTarget = null;
+            return true;
+        }
     }
+
+    return false;
 }
 
 function isValidRookMove(color, start, end) {
     const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
     const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
-    return (startFile === endFile && startRank !== endRank) || (startFile !== endFile && startRank === endRank);
+    // Rook can move horizontally or vertically
+    if (startFile === endFile || startRank === endRank) {
+        // Check for obstructions
+        if (startFile === endFile) {
+            const step = startRank < endRank ? 1 : -1;
+            for (let rank = startRank + step; rank !== endRank; rank += step) {
+                if (document.getElementById(String.fromCharCode(startFile) + rank)?.querySelector('.piece')) {
+                    return false;
+                }
+            }
+        } else {
+            const step = startFile < endFile ? 1 : -1;
+            for (let file = startFile + step; file !== endFile; file += step) {
+                if (document.getElementById(String.fromCharCode(file) + startRank)?.querySelector('.piece')) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    return false;
 }
 
 function isValidKnightMove(color, start, end) {
     const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
     const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
-    const dx = Math.abs(endFile - startFile);
-    const dy = Math.abs(endRank - startRank);
-
-    return (dx === 2 && dy === 1) || (dx === 1 && dy === 2);
+    // Knight can move in an 'L' shape
+    const deltaFile = Math.abs(endFile - startFile);
+    const deltaRank = Math.abs(endRank - startRank);
+    return (deltaFile === 2 && deltaRank === 1) || (deltaFile === 1 && deltaRank === 2);
 }
 
 function isValidBishopMove(color, start, end) {
     const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
     const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
-    return Math.abs(endFile - startFile) === Math.abs(endRank - startRank);
+    // Bishop can move diagonally
+    const deltaFile = Math.abs(endFile - startFile);
+    const deltaRank = Math.abs(endRank - startRank);
+    if (deltaFile === deltaRank) {
+        // Check for obstructions
+        const fileStep = endFile > startFile ? 1 : -1;
+        const rankStep = endRank > startRank ? 1 : -1;
+        let file = startFile + fileStep;
+        let rank = startRank + rankStep;
+        while (file !== endFile && rank !== endRank) {
+            if (document.getElementById(String.fromCharCode(file) + rank)?.querySelector('.piece')) {
+                return false;
+            }
+            file += fileStep;
+            rank += rankStep;
+        }
+        return true;
+    }
+
+    return false;
 }
 
 function isValidQueenMove(color, start, end) {
+    // The queen can move like a rook or a bishop
     return isValidRookMove(color, start, end) || isValidBishopMove(color, start, end);
 }
 
@@ -135,10 +217,89 @@ function isValidKingMove(color, start, end) {
     const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
     const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
-    const dx = Math.abs(endFile - startFile);
-    const dy = Math.abs(endRank - startRank);
+    // King can move one square in any direction
+    const deltaFile = Math.abs(endFile - startFile);
+    const deltaRank = Math.abs(endRank - startRank);
+    return (deltaFile === 1 && deltaRank <= 1) || (deltaFile <= 1 && deltaRank === 1);
+}
 
-    return (dx <= 1 && dy <= 1);
+function updateGameState(piece, targetSquare) {
+    const pieceType = piece.innerHTML;
+    const pieceColor = piece.id.includes('_w') ? 'white' : 'black';
+    const startSquare = piece.parentElement.id;
+    const endSquare = targetSquare.id;
+    const [endFile, endRank] = [endSquare.charCodeAt(0), parseInt(endSquare[1])];
+
+    // Check for pawn promotion
+    if (pieceType === '♙' && (pieceColor === 'white' && endRank === 8) || (pieceColor === 'black' && endRank === 1)) {
+        promotionQueue.push({
+            piece: piece,
+            targetSquare: targetSquare
+        });
+    } else {
+        // Increment the fifty-move rule counter
+        if (pieceType !== '♙' && !targetSquare.querySelector('.piece')) {
+            fiftyMoveRule++;
+        } else {
+            fiftyMoveRule = 0;
+        }
+
+        // Check for draw conditions
+        if (fiftyMoveRule >= 50 || isDrawByRepetition() || isDrawByInsufficientMaterial()) {
+            gameState = 'draw';
+            document.getElementById('game-state').innerText = 'The game ends in a draw.';
+        } else {
+            checkGameState();
+        }
+    }
+}
+
+function promotePawns() {
+    while (promotionQueue.length > 0) {
+        const { piece, targetSquare } = promotionQueue.shift();
+        const pieceColor = piece.id.includes('_w') ? 'white' : 'black';
+        piece.innerHTML = '♕'; // Promote to Queen
+        targetSquare.appendChild(piece);
+        document.getElementById(`queen_${pieceColor}`).classList.add('hidden');
+    }
+}
+
+function isDrawByRepetition() {
+    const currentBoard = Array.from(document.querySelectorAll('.square')).map(square => square.innerHTML);
+    if (boardHistory.includes(currentBoard.join(''))) {
+        return true;
+    }
+    boardHistory.push(currentBoard.join(''));
+    return false;
+}
+
+function isDrawByInsufficientMaterial() {
+    const pieces = document.querySelectorAll('.piece');
+    let pieceCount = {
+        'white': 0,
+        'black': 0
+    };
+
+    for (const piece of pieces) {
+        const pieceColor = piece.id.includes('_w') ? 'white' : 'black';
+        const pieceType = piece.innerHTML;
+        if (pieceType === '♙' || pieceType === '♟') {
+            return false; // There is at least one pawn, so not a draw
+        }
+        pieceCount[pieceColor]++;
+    }
+
+    // King vs. King
+    if (pieceCount['white'] === 1 && pieceCount['black'] === 1) {
+        return true;
+    }
+
+    // King vs. King and Bishop/Knight
+    if ((pieceCount['white'] === 1 && pieceCount['black'] === 2) || (pieceCount['black'] === 1 && pieceCount['white'] === 2)) {
+        return true;
+    }
+
+    return false;
 }
 
 function checkGameState() {
