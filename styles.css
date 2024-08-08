@@ -74,3 +74,16 @@ body {
     background: #eee;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
+
+@keyframes highlightMove {
+    from {
+        background-color: yellow;
+    }
+    to {
+        background-color: transparent;
+    }
+}
+
+.highlight {
+    animation: highlightMove 1s ease;
+}
