@@ -1,23 +1,36 @@
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
+    font-family: 'Arial', sans-serif;
 }
 
 .chessboard {
     display: grid;
-    grid-template-columns: repeat(8, 50px);
-    grid-template-rows: repeat(8, 50px);
+    grid-template-columns: repeat(8, 60px);
+    grid-template-rows: repeat(8, 60px);
     gap: 0;
-    border: 2px solid #000;
+    border: 3px solid #333;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .square {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    transition: background-color 0.3s;
+}
+
+.square:hover {
+    background-color: #ddd;
 }
 
 .black {
@@ -29,12 +42,35 @@ body {
 }
 
 .piece {
-    font-size: 36px;
-    text-align: center;
-    line-height: 50px;
     cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.hide {
-    display: none;
+.piece.dragging {
+    opacity: 0.5;
+    transform: scale(1.2);
+}
+
+#turn-indicator {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #f06, #ff9);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+#drag-text {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #555;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+    background: #eee;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
