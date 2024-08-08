@@ -8,22 +8,22 @@
 </head>
 <body>
     <div class="chessboard">
-        <div class="square white" id="a1"><span class="piece" draggable="true">&#9814;</span></div>
-        <div class="square black" id="b1"><span class="piece" draggable="true">&#9816;</span></div>
-        <div class="square white" id="c1"><span class="piece" draggable="true">&#9815;</span></div>
-        <div class="square black" id="d1"><span class="piece" draggable="true">&#9813;</span></div>
-        <div class="square white" id="e1"><span class="piece" draggable="true">&#9812;</span></div>
-        <div class="square black" id="f1"><span class="piece" draggable="true">&#9815;</span></div>
-        <div class="square white" id="g1"><span class="piece" draggable="true">&#9816;</span></div>
-        <div class="square black" id="h1"><span class="piece" draggable="true">&#9814;</span></div>
-        <div class="square black" id="a2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square white" id="b2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square black" id="c2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square white" id="d2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square black" id="e2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square white" id="f2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square black" id="g2"><span class="piece" draggable="true">&#9817;</span></div>
-        <div class="square white" id="h2"><span class="piece" draggable="true">&#9817;</span></div>
+        <div class="square white" id="a1"><span class="piece" id="rook_w" draggable="true">&#9814;</span></div>
+        <div class="square black" id="b1"><span class="piece" id="knight_w" draggable="true">&#9816;</span></div>
+        <div class="square white" id="c1"><span class="piece" id="bishop_w" draggable="true">&#9815;</span></div>
+        <div class="square black" id="d1"><span class="piece" id="queen_w" draggable="true">&#9813;</span></div>
+        <div class="square white" id="e1"><span class="piece" id="king_w" draggable="true">&#9812;</span></div>
+        <div class="square black" id="f1"><span class="piece" id="bishop_w2" draggable="true">&#9815;</span></div>
+        <div class="square white" id="g1"><span class="piece" id="knight_w2" draggable="true">&#9816;</span></div>
+        <div class="square black" id="h1"><span class="piece" id="rook_w2" draggable="true">&#9814;</span></div>
+        <div class="square black" id="a2"><span class="piece" id="pawn_w1" draggable="true">&#9817;</span></div>
+        <div class="square white" id="b2"><span class="piece" id="pawn_w2" draggable="true">&#9817;</span></div>
+        <div class="square black" id="c2"><span class="piece" id="pawn_w3" draggable="true">&#9817;</span></div>
+        <div class="square white" id="d2"><span class="piece" id="pawn_w4" draggable="true">&#9817;</span></div>
+        <div class="square black" id="e2"><span class="piece" id="pawn_w5" draggable="true">&#9817;</span></div>
+        <div class="square white" id="f2"><span class="piece" id="pawn_w6" draggable="true">&#9817;</span></div>
+        <div class="square black" id="g2"><span class="piece" id="pawn_w7" draggable="true">&#9817;</span></div>
+        <div class="square white" id="h2"><span class="piece" id="pawn_w8" draggable="true">&#9817;</span></div>
         <div class="square white" id="a3"></div>
         <div class="square black" id="b3"></div>
         <div class="square white" id="c3"></div>
@@ -56,22 +56,22 @@
         <div class="square white" id="f6"></div>
         <div class="square black" id="g6"></div>
         <div class="square white" id="h6"></div>
-        <div class="square white" id="a7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square black" id="b7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square white" id="c7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square black" id="d7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square white" id="e7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square black" id="f7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square white" id="g7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square black" id="h7"><span class="piece" draggable="true">&#9823;</span></div>
-        <div class="square black" id="a8"><span class="piece" draggable="true">&#9820;</span></div>
-        <div class="square white" id="b8"><span class="piece" draggable="true">&#9822;</span></div>
-        <div class="square black" id="c8"><span class="piece" draggable="true">&#9821;</span></div>
-        <div class="square white" id="d8"><span class="piece" draggable="true">&#9819;</span></div>
-        <div class="square black" id="e8"><span class="piece" draggable="true">&#9818;</span></div>
-        <div class="square white" id="f8"><span class="piece" draggable="true">&#9821;</span></div>
-        <div class="square black" id="g8"><span class="piece" draggable="true">&#9822;</span></div>
-        <div class="square white" id="h8"><span class="piece" draggable="true">&#9820;</span></div>
+        <div class="square white" id="a7"><span class="piece" id="pawn_b1" draggable="true">&#9823;</span></div>
+        <div class="square black" id="b7"><span class="piece" id="pawn_b2" draggable="true">&#9823;</span></div>
+        <div class="square white" id="c7"><span class="piece" id="pawn_b3" draggable="true">&#9823;</span></div>
+        <div class="square black" id="d7"><span class="piece" id="pawn_b4" draggable="true">&#9823;</span></div>
+        <div class="square white" id="e7"><span class="piece" id="pawn_b5" draggable="true">&#9823;</span></div>
+        <div class="square black" id="f7"><span class="piece" id="pawn_b6" draggable="true">&#9823;</span></div>
+        <div class="square white" id="g7"><span class="piece" id="pawn_b7" draggable="true">&#9823;</span></div>
+        <div class="square black" id="h7"><span class="piece" id="pawn_b8" draggable="true">&#9823;</span></div>
+        <div class="square black" id="a8"><span class="piece" id="rook_b1" draggable="true">&#9820;</span></div>
+        <div class="square white" id="b8"><span class="piece" id="knight_b1" draggable="true">&#9822;</span></div>
+        <div class="square black" id="c8"><span class="piece" id="bishop_b1" draggable="true">&#9821;</span></div>
+        <div class="square white" id="d8"><span class="piece" id="queen_b" draggable="true">&#9819;</span></div>
+        <div class="square black" id="e8"><span class="piece" id="king_b" draggable="true">&#9818;</span></div>
+        <div class="square white" id="f8"><span class="piece" id="bishop_b2" draggable="true">&#9821;</span></div>
+        <div class="square black" id="g8"><span class="piece" id="knight_b2" draggable="true">&#9822;</span></div>
+        <div class="square white" id="h8"><span class="piece" id="rook_b2" draggable="true">&#9820;</span></div>
     </div>
     <script src="script.js"></script>
 </body>
