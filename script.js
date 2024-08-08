@@ -1,6 +1,7 @@
 const pieces = document.querySelectorAll('.piece');
 const squares = document.querySelectorAll('.square');
 let turn = 'white'; // Track the current player's turn
+let gameState = 'in_progress'; // Track the game state (in_progress, checkmate, stalemate)
 
 pieces.forEach(piece => {
     piece.addEventListener('dragstart', dragStart);
@@ -14,7 +15,7 @@ squares.forEach(square => {
 
 function dragStart(e) {
     const pieceColor = e.target.id.includes('_w') ? 'white' : 'black';
-    if (pieceColor !== turn) {
+    if (pieceColor !== turn || gameState !== 'in_progress') {
         e.preventDefault();
         return;
     }
@@ -52,6 +53,7 @@ function drop(e) {
             targetSquare.classList.remove('highlight');
         }, 1000);
         switchTurn();
+        checkGameState();
     } else {
         targetSquare.classList.add('invalid-move');
         setTimeout(() => {
@@ -81,7 +83,10 @@ function isValidMove(piece, targetSquare) {
             return isValidKnightMove(pieceColor, startSquare, endSquare);
         case '♗': // Bishop
             return isValidBishopMove(pieceColor, startSquare, endSquare);
-        // Add cases for other pieces
+        case '♕': // Queen
+            return isValidQueenMove(pieceColor, startSquare, endSquare);
+        case '♔': // King
+            return isValidKingMove(pieceColor, startSquare, endSquare);
         default:
             return true;
     }
@@ -122,22 +127,71 @@ function isValidBishopMove(color, start, end) {
     return Math.abs(endFile - startFile) === Math.abs(endRank - startRank);
 }
 
-const turnIndicator = document.createElement('div');
-turnIndicator.id = 'turn-indicator';
-turnIndicator.innerText = `Turn: ${turn}`;
-document.body.insertBefore(turnIndicator, document.body.firstChild);
+function isValidQueenMove(color, start, end) {
+    return isValidRookMove(color, start, end) || isValidBishopMove(color, start, end);
+}
 
-const dragText = document.createElement('div');
-dragText.id = 'drag-text';
-dragText.innerText = 'Drag a piece to move it';
-document.body.insertBefore(dragText, document.body.firstChild);
+function isValidKingMove(color, start, end) {
+    const [startFile, startRank] = [start.charCodeAt(0), parseInt(start[1])];
+    const [endFile, endRank] = [end.charCodeAt(0), parseInt(end[1])];
 
-const style = document.createElement('style');
-style.innerHTML = `
-    #turn-indicator {
-        font-size: 24px;
-        margin-bottom: 10px;
-        text-align: center;
+    const dx = Math.abs(endFile - startFile);
+    const dy = Math.abs(endRank - startRank);
+
+    return (dx <= 1 && dy <= 1);
+}
+
+function checkGameState() {
+    const whiteKing = document.getElementById('king_w');
+    const blackKing = document.getElementById('king_b');
+
+    // Check checkmate
+    if (isKingInCheck(whiteKing, 'black')) {
+        if (!hasValidMoves('white')) {
+            gameState = 'checkmate';
+            document.getElementById('game-state').innerText = 'Checkmate! Black wins.';
+        }
+    } else if (isKingInCheck(blackKing, 'white')) {
+        if (!hasValidMoves('black')) {
+            gameState = 'checkmate';
+            document.getElementById('game-state').innerText = 'Checkmate! White wins.';
+        }
+    } else if (!hasValidMoves('white') && !hasValidMoves('black')) {
+        gameState = 'stalemate';
+        document.getElementById('game-state').innerText = 'Stalemate! The game ends in a draw.';
+    } else {
+        gameState = 'in_progress';
+        document.getElementById('game-state').innerText = '';
     }
-`;
-document.head.appendChild(style);
+}
+
+function isKingInCheck(king, opposingColor) {
+    const kingSquare = king.parentElement;
+    const pieces = document.querySelectorAll(`.piece.${opposingColor}`);
+
+    for (const piece of pieces) {
+        if (isValidMove(piece, kingSquare)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function hasValidMoves(color) {
+    const pieces = document.querySelectorAll(`.piece.${color}`);
+
+    for (const piece of pieces) {
+        for (const square of squares) {
+            if (isValidMove(piece, square)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// Initialize the game state
+document.getElementById('turn-indicator').innerText = `Turn: ${turn}`;
+document.getElementById('game-state').innerText = '';

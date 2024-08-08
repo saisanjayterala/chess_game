@@ -5,96 +5,89 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f0f0f0;
+    background-color: #1a1a1a;
     font-family: 'Arial', sans-serif;
 }
-
 .chessboard {
     display: grid;
-    grid-template-columns: repeat(8, 60px);
-    grid-template-rows: repeat(8, 60px);
+    grid-template-columns: repeat(8, 80px);
+    grid-template-rows: repeat(8, 80px);
     gap: 0;
-    border: 3px solid #333;
+    border: 5px solid #333;
     position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
-
 .square {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    font-size: 50px;
     transition: background-color 0.3s;
 }
-
 .square:hover {
-    background-color: #ddd;
+    background-color: #444;
 }
-
 .black {
     background-color: #769656;
 }
-
 .white {
     background-color: #eeeed2;
 }
-
 .piece {
     cursor: pointer;
     transition: transform 0.2s;
 }
-
 .piece.dragging {
     opacity: 0.5;
     transform: scale(1.2);
 }
-
-#turn-indicator {
-    font-size: 24px;
-    margin-bottom: 20px;
+#game-info {
+    margin-top: 20px;
     text-align: center;
-    color: #333;
+    color: #fff;
     font-weight: bold;
-    padding: 10px;
-    border-radius: 10px;
-    background: linear-gradient(45deg, #f06, #ff9);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
-
-#drag-text {
-    font-size: 18px;
-    margin-top: 10px;
-    color: #555;
-    font-weight: bold;
-    padding: 5px;
-    border-radius: 5px;
-    background: #eee;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+#turn-indicator {
+    font-size: 24px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #ff6, #f06);
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.5), 0 0 20px rgba(255, 0, 102, 0.5);
 }
-
-@keyframes highlightMove {
-    from {
-        background-color: yellow;
-    }
-    to {
-        background-color: transparent;
-    }
+#game-state {
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #66ff66, #00b300);
+    box-shadow: 0 0 10px rgba(102, 255, 102, 0.5), 0 0 20px rgba(0, 179, 0, 0.5);
 }
-
-.highlight {
-    animation: highlightMove 1s ease;
-}
-/* Add styles for capture highlights and invalid move feedback */
 .capture {
     background-color: #ff9999;
+    animation: capture 1s ease;
 }
 .invalid-move {
     animation: invalid-move 0.5s ease;
 }
-
+.checkmate {
+    background-color: #ff6666;
+    animation: shake 0.5s ease-in-out;
+}
+.stalemate {
+    background-color: #ffff99;
+    animation: pulse 1s ease-in-out infinite;
+}
+@keyframes capture {
+    0% {
+        background-color: #ff9999;
+    }
+    100% {
+        background-color: transparent;
+    }
+}
 @keyframes invalid-move {
     0% {
         transform: translateX(-10px);
@@ -110,5 +103,33 @@ body {
     }
     100% {
         transform: translateX(0);
+    }
+}
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    50% {
+        transform: translateX(10px);
+    }
+    75% {
+        transform: translateX(-10px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
     }
 }
